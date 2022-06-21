@@ -58,7 +58,7 @@ func main() {
 	}
 
 	// Contract ABI
-	contractAbi, err := abi.JSON(strings.NewReader(string(token.Ierc20tokenABI)))
+	contractAbi, err := abi.JSON(strings.NewReader(string(token.TokenABI)))
 	if err != nil {
 		log.Fatal(err)
 	}
