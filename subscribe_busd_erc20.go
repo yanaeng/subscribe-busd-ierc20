@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"log"
 	"math/big"
@@ -15,6 +16,10 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
+	bun "github.com/uptrace/bun"
+	"github.com/uptrace/bun/dialect/pgdialect"
+	"github.com/uptrace/bun/driver/pgdriver"
+	"github.com/uptrace/bun/extra/bundebug"
 
 	"github.com/jon4hz/ethconvert/pkg/ethconvert"
 	"github.com/shopspring/decimal"
@@ -36,6 +41,8 @@ type LogApproval struct {
 
 func main() {
 	// Set Dial
+	db, ctx := ConnectDB(), Ctx()
+
 	client, err := ethclient.Dial("wss://speedy-nodes-nyc.moralis.io/f1b8d020016effdedbe0d713/bsc/testnet/archive/ws")
 	if err != nil {
 		log.Fatal(err)
@@ -97,6 +104,14 @@ func main() {
 				fmt.Printf("Tokens(Wei): %s\n", transferEvent.Tokens.String())
 				fmt.Println("Tokens:", tokenInEther)
 
+				TransferValues := map[string]interface{}{
+					"block_number": vLog.BlockNumber,
+					"from":         transferEvent.From.Hex(),
+					"to":           transferEvent.To.Hex(),
+					"tokens":       tokenInEther,
+				}
+				InsertData(db, ctx, TransferValues)
+
 			case logApprovalSigHash.Hex():
 				fmt.Printf("Log Name: Approval\n")
 
@@ -121,6 +136,14 @@ func main() {
 				fmt.Printf("Tokens (Wei): %s\n", approvalEvent.Tokens.String())
 				fmt.Println("Tokens:", tokenInEther)
 
+				TransferValues := map[string]interface{}{
+					"block_number": vLog.BlockNumber,
+					"from":         approvalEvent.TokenOwner.Hex(),
+					"to":           approvalEvent.Spender.Hex(),
+					"tokens":       tokenInEther,
+				}
+				InsertData(db, ctx, TransferValues)
+
 			}
 
 		}
@@ -129,4 +152,39 @@ func main() {
 
 	}
 
+}
+
+func InsertData(db *bun.DB, ctx context.Context, v map[string]interface{}) {
+	_, err := db.NewInsert().Model(&v).TableExpr("transfer_log").Exec(ctx)
+	if err != nil {
+		panic(err)
+	}
+}
+
+func Ctx() context.Context {
+	ctx := context.Background()
+	return ctx
+}
+
+func ConnectDB() *bun.DB {
+
+	// Open a PostgreSQL database.
+	dsn := "postgres://postgres:mysecretpassword@localhost:5432/test2?sslmode=disable"
+	pgdb := sql.OpenDB(pgdriver.NewConnector(pgdriver.WithDSN(dsn)))
+
+	// Create a Bun db on top of it.
+	db := bun.NewDB(pgdb, pgdialect.New())
+
+	// Print all queries to stdout.
+	db.AddQueryHook(bundebug.NewQueryHook(bundebug.WithVerbose(true)))
+	return db
+}
+
+type Transfer struct {
+	bun.BaseModel `bun:"borrow,alias:u"`
+
+	block_number int    `json:"block_number"`
+	from         string `json:"from"`
+	to           string `json:"to"`
+	tokens       string `json:"tokens"`
 }
