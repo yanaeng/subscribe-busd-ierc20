@@ -31,12 +31,12 @@ func InsertToDb() {
 	}
 
 	// 0x Protocol (BUSD) token address
-	coin_list := []common.Address{common.HexToAddress("0x665aE6c8B332cCE9B1B50d9B2c79d1731516d2fB"), common.HexToAddress("0x2F02f77c2bA5A7cE4924f2a1E5Ecc85580fDD096")}
+	address := []common.Address{common.HexToAddress("0x665aE6c8B332cCE9B1B50d9B2c79d1731516d2fB"), common.HexToAddress("0x2F02f77c2bA5A7cE4924f2a1E5Ecc85580fDD096"), common.HexToAddress("0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd"), common.HexToAddress("0xBb5f03Ea8Bee3cF0F646C5260115fb5a16Ca4Ae4")}
 	// contractAddressBusd := common.HexToAddress("0x665aE6c8B332cCE9B1B50d9B2c79d1731516d2fB")
 	// contractAddressUsdt := common.HexToAddress("0x2F02f77c2bA5A7cE4924f2a1E5Ecc85580fDD096")
 
 	query := ethereum.FilterQuery{
-		Addresses: coin_list,
+		Addresses: address,
 	}
 
 	logs := make(chan types.Log)
@@ -85,6 +85,7 @@ func InsertToDb() {
 				fmt.Printf("To: %s\n", transferEvent.To.Hex())
 				fmt.Printf("Tokens(Wei): %s\n", transferEvent.Tokens.String())
 				fmt.Println("Tokens:", tokenInEther)
+				TableHead := "transfer_log"
 
 				TransferValues := map[string]interface{}{
 					"block_number": vLog.BlockNumber,
@@ -92,7 +93,7 @@ func InsertToDb() {
 					"to":           transferEvent.To.Hex(),
 					"tokens":       transferEvent.Tokens.String(),
 				}
-				InsertData(db, ctx, TransferValues)
+				InsertData(db, ctx, TableHead, TransferValues)
 
 			case logApprovalSigHash.Hex():
 				fmt.Printf("Log Name: Approval\n")
@@ -117,14 +118,14 @@ func InsertToDb() {
 				fmt.Printf("Spender: %s\n", approvalEvent.Spender.Hex())
 				fmt.Printf("Tokens (Wei): %s\n", approvalEvent.Tokens.String())
 				fmt.Println("Tokens:", tokenInEther)
-
+				TableHead := "approve"
 				TransferValues := map[string]interface{}{
 					"block_number": vLog.BlockNumber,
 					"from":         approvalEvent.TokenOwner.Hex(),
 					"to":           approvalEvent.Spender.Hex(),
-					"tokens":       tokenInEther,
+					"tokens":       approvalEvent.Tokens.String(),
 				}
-				InsertData(db, ctx, TransferValues)
+				InsertData(db, ctx, TableHead, TransferValues)
 
 			}
 

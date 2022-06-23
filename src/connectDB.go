@@ -28,3 +28,4 @@ func ConnectDB() *bun.DB {
 	db.AddQueryHook(bundebug.NewQueryHook(bundebug.WithVerbose(true)))
 	return db
 }
+
