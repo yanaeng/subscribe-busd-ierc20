@@ -236,19 +236,6 @@ contract PoolSettingEvent {
 
 // pool token
 contract PoolToken {
-    struct PoolTokens {
-        uint256 pToken;
-        uint256 itpToken;
-        uint256 ifpToken;
-    }
-
-    uint256 public pTokenTotalSupply; //                // token represent principal lent to APHPool
-    uint256 public itpTokenTotalSupply; //              // token represent printipal (same as pToken) + interest (claimable token interest in InterestVault)
-    uint256 public ifpTokenTotalSupply; //              // token represent printipal (same as pToken) + interest (claimable forw interest in InterestVault)
-    mapping(uint256 => PoolTokens) public tokenHolders; // map nftId -> struct
-
-    // Allocating __gap for futhur variable (need to subtract equal to new state added)
-    uint256[10] private __gap_poolToken;
 
     event MintPToken(address indexed minter, uint256 indexed nftId, uint256 amount);
     event MintItpToken(
