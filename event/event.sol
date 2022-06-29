@@ -1,7 +1,7 @@
 pragma solidity ^0.8.14;
 
-// core borrowing event
 contract CoreBorrowingEvent {
+// core borrowing event
     event Borrow(
         address indexed owner,
         uint256 indexed nftId,
@@ -62,10 +62,8 @@ contract CoreBorrowingEvent {
         address bountyRewardTokenAddress,
         uint256 tokenSentBackToUser
     );
-}
+    // core event 
 
-// core event 
-contract CoreEvent {
     event SettleForwInterest(
         address indexed coreAddress,
         address indexed interestVaultAddress,
@@ -73,10 +71,8 @@ contract CoreEvent {
         address forwTokenAddress,
         uint256 amount
     );
-}
 
-// core setting event
-contract CoreSettingEvent {
+    // core setting event
     event SetMembershipAddress(address indexed sender, address oldValue, address newValue); //same event as in pool setting
     event SetPriceFeedAddress(address indexed sender, address oldValue, address newValue);
     event SetRouterAddress(address indexed sender, address oldValue, address newValue);
@@ -106,10 +102,8 @@ contract CoreSettingEvent {
     );
     event SetFowPerBlock(address indexed sender, uint256 amount, uint256 targetBlock);
     event ApprovedForRouter(address indexed sender, address asset, address router);
-}
 
-// timelock
-contract Timelock {
+    // timelock
     event CallScheduled(
         bytes32 indexed id,
         uint256 indexed index,
@@ -133,10 +127,8 @@ contract Timelock {
     event MinUrgentDelayChange(uint256 oldDuration, uint256 newDuration);
     event MinProxyAdminDelayChange(uint256 oldDuration, uint256 newDuration);
     event AvailablePeriodChange(uint256 oldDuration, uint256 newDuration);
-}
 
-// interest vault event
-contract InterestVaultEvent {
+    // interest vault event
     event SetTokenAddress(address indexed sender, address oldValue, address newValue);
     event SetForwAddress(address indexed sender, address oldValue, address newValue);
     event SetProtocolAddress(address indexed sender, address oldValue, address newValue);
@@ -165,10 +157,7 @@ contract InterestVaultEvent {
     event WithdrawForwInterest(address indexed sender, uint256 claimable);
 
     event WithdrawActualProfit(address indexed sender, uint256 profitWithdraw);
-}
-
-// pool lending event
-contract PoolLendingEvent {
+    // pool lending event
     event Deposit(
         address indexed owner,
         uint256 indexed nftId,
@@ -200,10 +189,8 @@ contract PoolLendingEvent {
         uint256 burnedIfp
     );
     event ActivateRank(address indexed owner, uint256 indexed nftId, uint8 oldRank, uint8 newRank);
-}
 
-// pool setting event
-contract PoolSettingEvent {
+    // pool setting event
     event SetBorrowInterestParams(
         address indexed sender,
         uint256[] rates,
@@ -232,24 +219,7 @@ contract PoolSettingEvent {
         address membershipAddress
     );
 
-}
-
-// pool token
-contract PoolToken {
-    struct PoolTokens {
-        uint256 pToken;
-        uint256 itpToken;
-        uint256 ifpToken;
-    }
-
-    uint256 public pTokenTotalSupply; //                // token represent principal lent to APHPool
-    uint256 public itpTokenTotalSupply; //              // token represent printipal (same as pToken) + interest (claimable token interest in InterestVault)
-    uint256 public ifpTokenTotalSupply; //              // token represent printipal (same as pToken) + interest (claimable forw interest in InterestVault)
-    mapping(uint256 => PoolTokens) public tokenHolders; // map nftId -> struct
-
-    // Allocating __gap for futhur variable (need to subtract equal to new state added)
-    uint256[10] private __gap_poolToken;
-
+    // pool token
     event MintPToken(address indexed minter, uint256 indexed nftId, uint256 amount);
     event MintItpToken(
         address indexed minter,
@@ -277,18 +247,14 @@ contract PoolToken {
         uint256 amount,
         uint256 price
     );
-}
 
-// stake pool
-contract StakePool {
+    // stake pool
     event Stake(address indexed sender, uint256 indexed nftId, uint256 amount);
     event UnStake(address indexed sender, uint256 indexed nftId, uint256 amount);
     event DeprecateStakeInfo(address indexed sender, uint256 indexed nftId);
     event SetPoolStartTimestamp(address indexed sender, uint64 indexed timestamp);
-}
 
-// utils
-contract Utils {
+    // utils
     event FaucetTransfer(
         address indexed to,
         address tokenAddress,
@@ -298,5 +264,4 @@ contract Utils {
     event GlobalPricingPaused(address indexed sender, bool isPaused);
     event SetPriceFeed(address indexed sender, address[] tokens, address[] feeds);
     event SetDecimals(address indexed sender, address[] tokens);
-
 }
